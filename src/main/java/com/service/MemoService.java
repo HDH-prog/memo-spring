@@ -46,4 +46,16 @@ public class MemoService {
         }
         return responseList;
     }
+
+    @Transactional(readOnly = true)
+    public GetMemoResponse getById(Long memoId) {
+        Memo memo = memoRepository.findById(memoId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 메모입니다.")
+        );
+        return new GetMemoResponse(
+                memo.getId(),
+                memo.getTitle(),
+                memo.getContent()
+        );
+    }
 }
