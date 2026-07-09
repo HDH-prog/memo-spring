@@ -3,6 +3,7 @@ package com.service;
 import com.dto.CreateMemoRequest;
 import com.dto.CreateMemoResponse;
 import com.dto.GetMemoResponse;
+import com.dto.UpdateMemoRequest;
 import com.entity.Memo;
 import com.repository.MemoRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class MemoService {
                 savedMemo.getContent());
     }
 
-    @Transactional(readOnly =true)
+    @Transactional(readOnly = true)
     public List<GetMemoResponse> getAll() {
         List<Memo> memoList = memoRepository.findAll();
         List<GetMemoResponse> responseList = new ArrayList<>();
@@ -57,5 +58,24 @@ public class MemoService {
                 memo.getTitle(),
                 memo.getContent()
         );
+    }
+
+    @Transactional
+    public GetMemoResponse update(Long memoId, UpdateMemoRequest request) {
+        Memo memo = memoRepository.findById(memoId).orElseThrow(
+                () -> new IllegalStateException("해당 메모가 없습니다"));
+        memo.update(request.getTitle(), request.getContent()
+        );
+        return new GetMemoResponse(memo.getId(), memo.getTitle(), memo.getContent());
+    }
+
+    @Transactional
+    public void delete(Long memoId) {
+        boolean existence = memoRepository.existsById(memoId);
+        if (!existence) {
+            throw new IllegalStateException("존재하지 않는 메모입니다.");
+        }
+
+        memoRepository.deleteById(memoId);
     }
 }
